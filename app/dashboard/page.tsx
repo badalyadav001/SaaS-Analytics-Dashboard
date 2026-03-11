@@ -16,6 +16,8 @@ const revenue = [
   { month: "Feb", value: 3000 },
   { month: "Mar", value: 5000 },
   { month: "Apr", value: 7000 },
+  { month: "May", value: 9000 },
+  { month: "Jun", value: 11000 },
 ]
 
 const users = [
@@ -23,6 +25,8 @@ const users = [
   { month: "Feb", users: 350 },
   { month: "Mar", users: 500 },
   { month: "Apr", users: 800 },
+  { month: "May", users: 1200 },
+  { month: "Jun", users: 1600 },
 ]
 
 export default function Dashboard() {
@@ -37,11 +41,11 @@ export default function Dashboard() {
       router.push("/login")
     }
 
-  }, [])
+  }, [router])
 
   return (
 
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
 
       <Sidebar />
 
@@ -49,19 +53,31 @@ export default function Dashboard() {
 
         <Navbar />
 
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-          SaaS Analytics Dashboard
-        </h1>
+        {/* Welcome */}
+
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+            Welcome back, Badal 👋
+          </h1>
+
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Here's what's happening with your platform today.
+          </p>
+
+        </div>
+
+        {/* Stats */}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          <StatsCard title="Total Revenue" value="$42,000" />
-
-          <StatsCard title="Active Users" value="8,420" />
-
-          <StatsCard title="Conversion Rate" value="12%" />
+          <StatsCard title="Total Revenue" value="$54,200" />
+          <StatsCard title="Active Users" value="9,840" />
+          <StatsCard title="Conversion Rate" value="14.2%" />
 
         </div>
+
+        {/* Charts */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -70,6 +86,8 @@ export default function Dashboard() {
           <UsersChart data={users} />
 
         </div>
+
+        {/* Table + Activity */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -84,4 +102,5 @@ export default function Dashboard() {
     </div>
 
   )
+
 }

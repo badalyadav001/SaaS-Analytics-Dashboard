@@ -25,9 +25,9 @@ export default function RevenueChart({ data }: Props) {
 
       <div className="flex justify-between items-center mb-4">
 
-        <h2 className="text-lg font-semibold">
-          Revenue Trends
-        </h2>
+        <h2 className="text-lg font-semibold dark:text-white">
+Revenue Trends
+</h2>
 
         <span className="text-sm text-gray-500">
           Last 4 Months

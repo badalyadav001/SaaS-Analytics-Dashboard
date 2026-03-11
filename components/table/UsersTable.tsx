@@ -9,6 +9,9 @@ export default function UsersTable() {
   const [users, setUsers] = useState<any[]>([])
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const usersPerPage = 5
 
   useEffect(() => {
 
@@ -20,7 +23,12 @@ export default function UsersTable() {
           "https://jsonplaceholder.typicode.com/users"
         )
 
-        setUsers(res.data)
+        const usersWithStatus = res.data.map((u: any) => ({
+          ...u,
+          status: Math.random() > 0.5 ? "Active" : "Inactive"
+        }))
+
+        setUsers(usersWithStatus)
 
       } catch (error) {
 
@@ -42,18 +50,24 @@ export default function UsersTable() {
     user.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Skeleton Loading UI
+  const indexOfLast = currentPage * usersPerPage
+  const indexOfFirst = indexOfLast - usersPerPage
+  const currentUsers = filteredUsers.slice(indexOfFirst, indexOfLast)
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
+
+  const deleteUser = (id: number) => {
+    setUsers(users.filter((user) => user.id !== id))
+  }
 
   if (loading) {
 
     return (
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow space-y-4">
-
         <Skeleton />
         <Skeleton />
         <Skeleton />
-
       </div>
 
     )
@@ -64,64 +78,145 @@ export default function UsersTable() {
 
     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
 
-      <h2 className="text-lg font-semibold mb-4 dark:text-white">
-        Users
-      </h2>
+      <div className="flex items-center justify-between mb-4">
 
-      {/* Search */}
+        <h2 className="text-lg font-semibold dark:text-white">
+          Users
+        </h2>
 
-      <input
-        type="text"
-        placeholder="Search users..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600"
-      />
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white w-60"
+        />
 
-      {/* Table */}
+      </div>
 
-      <table className="w-full text-left">
+      <div className="overflow-x-auto">
 
-        <thead className="bg-gray-50 dark:bg-gray-700">
+        <table className="w-full text-left">
 
-          <tr className="border-b dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
 
-            <th className="py-2 dark:text-gray-300">Name</th>
-            <th className="py-2 dark:text-gray-300">Email</th>
-            <th className="py-2 dark:text-gray-300">Company</th>
+            <tr>
 
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {filteredUsers.map((user) => (
-
-            <tr
-              key={user.id}
-              className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-            >
-
-              <td className="py-2 dark:text-white">
-                {user.name}
-              </td>
-
-              <td className="py-2 dark:text-white">
-                {user.email}
-              </td>
-
-              <td className="py-2 dark:text-white">
-                {user.company?.name}
-              </td>
+              <th className="py-3 px-4">User</th>
+              <th className="py-3 px-4">Email</th>
+              <th className="py-3 px-4">Company</th>
+              <th className="py-3 px-4">Status</th>
+              <th className="py-3 px-4">Actions</th>
 
             </tr>
 
-          ))}
+          </thead>
 
-        </tbody>
+          <tbody>
 
-      </table>
+            {currentUsers.map((user) => (
+
+              <tr
+                key={user.id}
+                className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              >
+
+                {/* User */}
+
+                <td className="py-3 px-4 flex items-center gap-3">
+
+                  <div className="w-9 h-9 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-semibold">
+
+                    {user.name.charAt(0)}
+
+                  </div>
+
+                  <span className="dark:text-white">
+                    {user.name}
+                  </span>
+
+                </td>
+
+                {/* Email */}
+
+                <td className="py-3 px-4 dark:text-white">
+                  {user.email}
+                </td>
+
+                {/* Company */}
+
+                <td className="py-3 px-4 dark:text-white">
+                  {user.company?.name}
+                </td>
+
+                {/* Status */}
+
+                <td className="py-3 px-4">
+
+                  <span
+                    className={`px-3 py-1 text-xs rounded-full font-medium ${
+                      user.status === "Active"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
+                    }`}
+                  >
+
+                    {user.status}
+
+                  </span>
+
+                </td>
+
+                {/* Actions */}
+
+                <td className="py-3 px-4 flex gap-4">
+
+                  <button className="text-blue-500 hover:underline text-sm">
+                    View
+                  </button>
+
+                  <button
+                    onClick={() => deleteUser(user.id)}
+                    className="text-red-500 hover:underline text-sm"
+                  >
+                    Delete
+                  </button>
+
+                </td>
+
+              </tr>
+
+            ))}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      {/* Pagination */}
+
+      <div className="flex justify-end gap-2 mt-6">
+
+        {Array.from({ length: totalPages }, (_, i) => (
+
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-3 py-1 rounded-lg text-sm ${
+              currentPage === i + 1
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 dark:text-white"
+            }`}
+          >
+
+            {i + 1}
+
+          </button>
+
+        ))}
+
+      </div>
 
     </div>
 
